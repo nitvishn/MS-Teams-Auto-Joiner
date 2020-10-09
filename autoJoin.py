@@ -20,9 +20,9 @@ opt.add_argument("start-maximized")
 opt.add_argument("--disable-extensions")
 # Pass the argument 1 to allow and 2 to block
 opt.add_experimental_option("prefs", { \
-    "profile.default_content_setting_values.media_stream_mic": 1, 
+    "profile.default_content_setting_values.media_stream_mic": 1,
     "profile.default_content_setting_values.media_stream_camera": 1,
-    "profile.default_content_setting_values.notifications": 1 
+    "profile.default_content_setting_values.notifications": 1
 })
 
 browser = webdriver.Chrome(ChromeDriverManager().install(),options=opt)
@@ -68,6 +68,13 @@ def wait_and_find_elements_by_xpath(xpath, timeout=timeOutDelay):
             return ele
 
 def checkAndJoinMeeting():
+    from datetime import datetime
+
+    S = datetime.now()
+    if S.hour == 7 and 45 <= S.minute <= 55:
+        print("Trying to log into form class.")
+        elem = browser.find_elements_by_class_name("node_modules--msteams-bridges-components-calendar-grid-dist-es-src-renderers-calendar-multi-day-renderer-calendar-multi-day-renderer__eventCard--3NBeS");
+        elem[0].click()
     global maxParticipants, curParticipants
     joins = wait_and_find_elements_by_xpath('//button[.="Join"]', 3)
     if len(joins) == 0: # no meeting scheduled
@@ -81,7 +88,7 @@ def checkAndJoinMeeting():
         elem.click()
     wait_and_find_element_by_xpath('//button[.="Join now"]', timeOutDelay).click() # join meeting
     print('Joined the meeting at {}'.format(datetime.now()))
-    sleep(60*5)
+    sleep(60)
     actions = ActionChains(browser)
     rosterBtn = wait_and_find_element_by_xpath('//button[@id="roster-button"]', timeOutDelay)
     actions.move_to_element(rosterBtn).click().perform()
@@ -95,6 +102,7 @@ def checkAndEndOrLeaveOrJoinMeeting():
     hangupBtn = wait_and_find_element_by_xpath('//button[@id="hangup-button"]', 2)
     if hangupBtn != None: # currently in meeting
         numStr = wait_and_find_elements_by_xpath('//span[@class="toggle-number"][@ng-if="::ctrl.enableRosterParticipantsLimit"]')
+        print(numStr)
         if len(numStr) >= 2:
             if numStr[1].text[1:-1] != '':
                 curParticipants = int(numStr[1].text[1:-1])
@@ -130,8 +138,8 @@ def init():
     wait_and_find_ele_by_id('idSIButton9', timeOutDelay).click()                    # click next
     wait_and_find_ele_by_id('i0118', timeOutDelay).send_keys(data['password'])      # enter password
     wait_and_find_ele_by_id('idSIButton9', timeOutDelay).click()                    # click next
-    wait_and_find_ele_by_id('idSIButton9', timeOutDelay).click()                    # click yes to stay signed in 
-    wait_and_find_ele_by_link_text('Use the web app instead', timeOutDelay).click() # click use the web app instead link  
+    wait_and_find_ele_by_id('idSIButton9', timeOutDelay).click()                    # click yes to stay signed in
+    wait_and_find_ele_by_link_text('Use the web app instead', timeOutDelay).click() # click use the web app instead link
     while wait_and_find_element_by_xpath('//button[@title="Switch your calendar view"]', timeOutDelay) == None: #   wait for calendar tab to completely load
         sleep(5)
     while wait_and_find_element_by_xpath('//button[@title="Switch your calendar view"]', timeOutDelay).get_attribute('name') != "Day": # change calender work-week view to day view
@@ -139,11 +147,14 @@ def init():
         wait_and_find_element_by_xpath('//button[@name="Day"]', timeOutDelay).click()
     print('Initialized Succesfully at {}'.format(datetime.now()))
     checkAndJoinMeeting()
+    # readyFormClass()
 
 def main():
     global browser
     try:
         init()
+    except KeyboardInterrupt:
+        print("quitting. I hope I've served you well master!")
     except:
         print('init failed, trying again')
         main()
