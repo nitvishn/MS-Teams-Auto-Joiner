@@ -88,7 +88,6 @@ def checkAndJoinMeeting():
         elem.click()
     wait_and_find_element_by_xpath('//button[.="Join now"]', timeOutDelay).click() # join meeting
     print('Joined the meeting at {}'.format(datetime.now()))
-    sleep(60)
     actions = ActionChains(browser)
     rosterBtn = wait_and_find_element_by_xpath('//button[@id="roster-button"]', timeOutDelay)
     actions.move_to_element(rosterBtn).click().perform()
@@ -102,7 +101,6 @@ def checkAndEndOrLeaveOrJoinMeeting():
     hangupBtn = wait_and_find_element_by_xpath('//button[@id="hangup-button"]', 2)
     if hangupBtn != None: # currently in meeting
         numStr = wait_and_find_elements_by_xpath('//span[@class="toggle-number"][@ng-if="::ctrl.enableRosterParticipantsLimit"]')
-        print(numStr)
         if len(numStr) >= 2:
             if numStr[1].text[1:-1] != '':
                 curParticipants = int(numStr[1].text[1:-1])

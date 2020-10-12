@@ -1,0 +1,2 @@
+py autoJoin.py
+pause
